@@ -109,7 +109,8 @@ class Crypto:
                 hashGroups[len(sWord)] += [sWord]
             else:
                 hashGroups[len(sWord)] = [sWord]
-        print(hashGroups)   
+
+        self.print_hashGroups(hashGroups)   
 
     # Группировка слов по кол-ву нерасшифрованных букв в слове
     def n_characters(self):
@@ -131,7 +132,7 @@ class Crypto:
                 else:
                     hashGroups[count] = [sWord]
 
-        print(hashGroups)   
+        self.print_hashGroups(hashGroups)   
 
 
     # Возврат по истории
@@ -149,22 +150,27 @@ class Crypto:
 
     # Предлагаемые замены
     def change_variant(self):
-        print(self.hashTable)
+        #print(self.hashTable)
         i = 0
+        lstCheck = []
         for key in self.hashTable:
             m = 10
             for keyCh in self.hashSt2:
                 val = self.hashTable[key]
                 valCh = self.hashSt2[keyCh]
                 dVal = abs(val-valCh)
-                if m > dVal: 
-                    self.hashUpdateChar[key] = [keyCh]
-                    m = dVal
-                elif m == dVal: self.hashUpdateChar[key] += [keyCh]
+                if keyCh not in lstCheck:
+                    if m > dVal: 
+                        self.hashUpdateChar[key] = keyCh
+                        m = dVal
+                    elif m == dVal: self.hashUpdateChar[key] = keyCh
+                    lstCheck += [self.hashUpdateChar[key]]
             
         for key in self.hashTable:
-            if i < len(self.st) and self.st[i] not in self.hashUpdateChar[key]:
-                self.hashUpdateChar[key] += [self.st[i]]
+            if key not in self.hashUpdateChar:
+                self.hashUpdateChar[key] = self.st[i]
+            elif i < len(self.st) and self.st[i] not in self.hashUpdateChar[key] and self.st[i] not in lstCheck:
+                self.hashUpdateChar[key] = self.st[i]
             i += 1
             
         
@@ -202,6 +208,14 @@ class Crypto:
 
 
     # Принты:
+
+    def print_hashGroups(self, hashGroups):
+        print('---------------------------\n')
+        for key in sorted(hashGroups):
+            print(f"{key} => {hashGroups[key]}")
+        print('\n---------------------------')
+        input()
+
     # Отображение криптограммы
     def print_crypto(self):
         print('---------------------------\n')
@@ -235,7 +249,7 @@ def main():
     objCrypto.chastot_analys()
     objCrypto.change_variant()
     x = 0
-    while x != 6:
+    while x != 9:
         print('---------------------------\n')
         print('1. Заменить букву')
         print('2. Отображение криптограммы на данный момент')
