@@ -24,6 +24,7 @@ class Crypto:
         self.sCrypto = str.upper()
         self.nCount = len(str.strip())
         self.hashTable= {}
+        self.lstUse = []
         self.hashUpdateChar = {}
         self.st = 'оеаинтсрвлкмдпуязыбьъгчйхёжшюцщэф'
         self.hashSt2 = {
@@ -106,13 +107,16 @@ class Crypto:
     def rendo_history(self):
         self.objHistory.back()
         self.sCrypto = self.objHistory.get_last_update()
+        self.lstUse.pop()
+        self.lstUse.pop()
 
     # Замена букв
     def change_c(self):
         x = input("Введите букву, которую хотите заменить: ")
         y = input("Введите букву, на которую хотите заменить: ")
-        self.sCrypto = self.sCrypto.replace(x.strip().upper(), y.strip().lower())
+        self.sCrypto = self.sCrypto.replace(x.strip(), y.strip().lower())
         self.objHistory.update(self.sCrypto)
+        self.lstUse += [x, y]
         self.print_crypto()
 
     # Предлагаемые замены
@@ -156,19 +160,18 @@ class Crypto:
 
     # Автоматическая замена
     def auto_crypto(self):
-        f = open('output.txt', 'w', encoding='utf-8')
-        lstUsed = []
         ss = self.sStart
         for key in self.hashUpdateChar:
             flag = 0
-            for val in self.hashUpdateChar[key]:
-                if val not in lstUsed:
-                    flag = 1
-                    lstUsed += [val]
-                    ss = ss.replace(key, val)
-            if flag == 0:
-                ss = ss.replace(key, '*')
-        f.write(ss)
+            val = self.hashUpdateChar[key]
+            if val not in self.lstUse and key not in self.lstUse:
+                flag = 1
+                self.lstUse += [val, key]
+                self.sCrypto = self.sCrypto.replace(key, val)
+                
+        self.lstUse = list(set(self.lstUse)) 
+        self.objHistory.update(self.sCrypto)
+        self.print_crypto()
 
 
     # Принты:
@@ -226,20 +229,20 @@ def main():
         print('8. Автоматическая замена')
         print('9. Выход')
         print('\n')
-        x = int(input("Введите действие: "))
+        x = input("Введите действие: ")
         print('\n---------------------------')
         
-        if x == 1: 
+        if x == '1': 
             objCrypto.change_c()
             continue
-        elif x == 2: objCrypto.print_crypto()
-        elif x == 3: objCrypto.print_chastot_analys()
-        elif x == 4: objCrypto.print_change_variant()
-        elif x == 5: objCrypto.rendo_history()
-        elif x == 6: objCrypto.n_words()
-        elif x == 7: objCrypto.n_characters()
-        elif x == 8: objCrypto.auto_crypto()
-        elif x == 9: break
+        elif x == '2': objCrypto.print_crypto()
+        elif x == '3': objCrypto.print_chastot_analys()
+        elif x == '4': objCrypto.print_change_variant()
+        elif x == '5': objCrypto.rendo_history()
+        elif x == '6': objCrypto.n_words()
+        elif x == '7': objCrypto.n_characters()
+        elif x == '8': objCrypto.auto_crypto()
+        elif x == '9': break
         else: 
             print('Некорректный ввод!')
             continue
